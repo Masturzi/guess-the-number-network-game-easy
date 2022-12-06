@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <random>
 
 // A very simple network game where the server generates 
 // a random number and the client
