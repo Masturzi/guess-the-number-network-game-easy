@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sstream>
+#include <algorithm>
 
 // A very simple network game where the server generates 
 // a random number and the client
@@ -15,43 +17,51 @@
 // Author: Don P
 // Date: December 6, 2022
 
+using std::socket;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::stringstream;
+using std::fill;
+
 int main()
 {
     // Create a socket
-    int sockfd = std::socket(AF_INET, SOCK_STREAM, 0);
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     // Connect to the server
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(369);
-    addr.sin_addr.s_addr = std::inet_addr("127.0.0.1");
-    std::connect(sockfd, (struct sockaddr*)&addr, sizeof(addr));
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    connect(sockfd, (struct sockaddr*)&addr, sizeof(addr));
 
     // Loop until the user guesses the number
     while (true)
     {
         // Prompt the user to enter a guess
-        std::cout << "Enter a guess: ";
+        cout << "Enter a guess: ";
         int guess;
-        std::cin >> guess;
+        cin >> guess;
 
         // Send the guess to the server
         char buffer[1024];
-        std::sprintf(buffer, "%d", guess);
-        std::write(sockfd, buffer, std::strlen(buffer));
+        stringstream ss;
+        ss << guess;
+        write(sockfd, ss.str().c_str(), ss.str().length());
 
         // Read the response from the server
-        std::memset(buffer, 0, sizeof(buffer));
-        int n = std::read(sockfd, buffer, sizeof(buffer));
+        fill(buffer, buffer + sizeof(buffer), 0);
+        int n = read(sockfd, buffer, sizeof(buffer));
 
         // Print the response from the server
-        std::cout << buffer;
+        cout << buffer;
 
         // Check if the user won
-        if (std::strstr(buffer, "You won") != NULL)
+        if (strstr(buffer, "You won") != NULL)
         {
             // Close the socket
-            std::close(sockfd);
+            close(sockfd);
 
             // Exit the loop
             break;
