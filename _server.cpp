@@ -21,7 +21,7 @@ int main()
     // Bind the socket to an IP address and port
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(8000);
+    addr.sin_port = htons(369);
     addr.sin_addr.s_addr = INADDR_ANY;
     std::bind(sockfd, (struct sockaddr*)&addr, sizeof(addr));
 
