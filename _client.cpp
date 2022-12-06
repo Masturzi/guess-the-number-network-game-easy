@@ -8,6 +8,13 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+// A very simple network game where the server generates 
+// a random number and the client
+// tries to guess the number.
+//
+// Author: Don P
+// Date: December 6, 2022
+
 int main()
 {
     // Create a socket
