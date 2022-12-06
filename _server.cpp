@@ -16,45 +16,53 @@
 // Author: Don P
 // Date: December 6, 2022
 
+using std::srand;
+using std::random_device;
+using std::uniform_int_distribution;
+using std::ostream;
+using std::cout;
+using std::endl;
+
 int main()
 {
     // Generate a random number to be guessed
-    std::srand(std::time(NULL));
-    int number = std::rand() % 100 + 1;
+    random_device rd;
+    srand(rd());
+    uniform_int_distribution<int> dist(1, 100);
+    int number = dist(rd);
 
     // Create a socket
-    int sockfd = std::socket(AF_INET, SOCK_STREAM, 0);
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     // Bind the socket to an IP address and port
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(369);
     addr.sin_addr.s_addr = INADDR_ANY;
-    std::bind(sockfd, (struct sockaddr*)&addr, sizeof(addr));
+    bind(sockfd, (struct sockaddr*)&addr, sizeof(addr));
 
     // Listen for incoming connections
-    std::listen(sockfd, 5);
+    listen(sockfd, 5);
 
     // Accept an incoming connection
-    int clientfd = std::accept(sockfd, NULL, NULL);
+    int clientfd = accept(sockfd, NULL, NULL);
 
     // Loop until the client guesses the number
     while (true)
     {
         // Read a guess from the client
         char buffer[1024];
-        int n = std::read(clientfd, buffer, sizeof(buffer));
-        int guess = std::atoi(buffer);
+        int n = read(clientfd, buffer, sizeof(buffer));
+        int guess = atoi(buffer);
 
         // Check if the guess is correct
         if (guess == number)
         {
             // Send a message to the client indicating that they won
-            const char* response = "You won!\n";
-            std::write(clientfd, response, std::strlen(response));
+            cout << "You won!" << endl;
 
             // Close the client socket
-            std::close(clientfd);
+            close(clientfd);
 
             // Exit the loop
             break;
@@ -62,19 +70,17 @@ int main()
         else if (guess < number)
         {
             // Send a message to the client indicating that their guess is too low
-            const char* response = "Your guess is too low.\n";
-            std::write(clientfd, response, std::strlen(response));
+            cout << "Your guess is too low." << endl;
         }
         else
         {
             // Send a message to the client indicating that their guess is too high
-            const char* response = "Your guess is too high.\n";
-            std::write(clientfd, response, std::strlen(response));
+            cout << "Your guess is too high." << endl;
         }
     }
 
     // Close the server socket
-    std::close(sockfd);
+    close(sockfd);
 
     return 0;
 }
